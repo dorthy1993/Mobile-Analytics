@@ -7,4 +7,4 @@ dplyr; corrgram; ggplot2
 
 **#Predictive Model**
 
-Binomial Regression; Logistic Regression; 
+Binomial Regression; Logistic Regression
