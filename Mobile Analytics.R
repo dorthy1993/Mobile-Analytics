@@ -48,7 +48,6 @@ fit.didclick_distance_sqrt <- glm(didclick ~ distance + distance_squared + imp_l
                         data = Geo_fence, family = binomial())
 summary(fit.didclick_distance_sqrt)
 
-#Findings: The model "fit.didclick_distance_sqrt" which includes squared distance has better performance,meaning "didclick" and "distance" has quadratic relationship.
 
 fit.didclick_reduced <- glm(didclick ~ distance + distance_squared + imp_large 
                            + cat_tech + os_ios,
