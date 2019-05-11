@@ -27,11 +27,18 @@ Geo_fence$distance_group <-ifelse(between(distance, 0, 0.5), 1,
                                                 ifelse(between(distance, 2, 4), 4, 
                                                        ifelse(between(distance, 4, 7), 5,
                                                               ifelse(between(distance, 7, 10), 6, 
-                                                                     ifelse(distance >10, 7, NA)))))))
+                                                                     ifelse(distance >10, 7, 0)))))))
 
 
-Geo_fence <- Geo_fence%>%group_by(distance_group)%>%
-  mutate(click_through_rate = mean(didclick))
+library("sqldf")
+
+mean_ctr <- sqldf("select distance, distance_group, avg(didclick) as mean_didclick 
+                    from Geo_fence group by distance_group")
+
+barplot(mean_ctr$mean_didclick, mean_ctr$distance_group, 
+        xlab="Distance_group", ylab="CTR",
+        names.arg=c("<0.5", "0.5-<1.0", "1.0-<2.0", "2.0-<4.0", "4.0-<7.0", "7.0-<10.0","10.0>"),width =100
+)
 
 #Create variables "distance_squared", "ln_app_review_vol"
 Geo_fence$ln_app_review_vol <- log(app_review_vol)
@@ -72,9 +79,9 @@ corrgram(cor_geofence, order = TRUE, lower.panel = panel.shade,
 
 #Scatterplot of distance and click-through-rate
 library(car)
-attach(Geo_fence)
+attach(mean_ctr)
 
-scatterplot(click_through_rate ~ distance, xlab = "distance", 
+scatterplot(mean_didclick ~ distance, xlab = "distance", 
             ylab = "click_through_rate", main = "distance and click-through-rate")
 
 #We found that the closer mobile device to geofence, the higher the click-through-rate.
@@ -95,6 +102,3 @@ fit.didclick_reduced <- glm(didclick ~ distance + distance_squared + imp_large
                             data = Geo_fence, family = binomial())
 summary(fit.didclick_reduced)
 
-
-              
-              
