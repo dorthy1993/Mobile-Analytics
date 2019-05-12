@@ -14,6 +14,9 @@ Geo_fence$cat_social <- ifelse(app_topcat == "IAB14", 1, 0)
 Geo_fence$cat_tech <- ifelse(app_topcat == "IAB19-6", 1, 0)
 Geo_fence$os_ios <- ifelse(device_os == "iOS", 1, 0)
 
+## Create variable distance using Harvesine formula to calculate the distance 
+## for a pair of latitude/longitude coordinates.
+
 library(aspace)
 Geo_fence$distance <- 6371 * acos(cos(as_radians(device_lat)) * cos(as_radians(geofence_lat)) 
                                   * cos(as_radians(device_lon) - as_radians(geofence_lon)) 
@@ -37,7 +40,7 @@ mean_ctr <- sqldf("select distance, distance_group, avg(didclick) as mean_didcli
 
 barplot(mean_ctr$mean_didclick, mean_ctr$distance_group, 
         xlab="Distance_group", ylab="CTR",
-        names.arg=c("<0.5", "0.5-<1.0", "1.0-<2.0", "2.0-<4.0", "4.0-<7.0", "7.0-<10.0","10.0>"),width =100
+        names.arg=c("<0.5", "0.5-<1.0", "1.0-<2.0", "2.0-<4.0", "4.0-<7.0", "7.0-<10.0","10.0>"),width =500
 )
 
 #Create variables "distance_squared", "ln_app_review_vol"
@@ -86,7 +89,7 @@ scatterplot(mean_didclick ~ distance, xlab = "distance",
 
 #We found that the closer mobile device to geofence, the higher the click-through-rate.
 
-#logistic regression of "didclick"
+#Logistic regression of "didclick"
 fit.didclick <- glm(didclick ~ distance + imp_large + cat_entertainment
                     + cat_social + cat_tech + os_ios + ln_app_review_vol + app_review_val,
                     data = Geo_fence, family = binomial())
@@ -101,4 +104,5 @@ fit.didclick_reduced <- glm(didclick ~ distance + distance_squared + imp_large
                             + cat_tech + os_ios,
                             data = Geo_fence, family = binomial())
 summary(fit.didclick_reduced)
+
 
